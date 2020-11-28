@@ -1,0 +1,8 @@
+1> select DB_NAME()
+2> GO
+
+1> select * from sysobjects where xtype = 'U'
+2> GO
+
+1> select * from orders;
+2> GO
