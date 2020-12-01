@@ -41,6 +41,7 @@ The demo includes a simple example within the `simple` subdirectory and an examp
 ## Running the example with the Dead Letter Topic
 
 * `cd DLT`
+* Deploy the connector. `./post-connector.sh`
 * Verify the status of the connector: `./get-connector-status.sh`
 * Verify the log of the connect worker: `confluent local services connect log -f`
 * Produce some good sample messages, that the connector will be able to handle: `./produce-good-messages.sh`
@@ -50,3 +51,4 @@ The demo includes a simple example within the `simple` subdirectory and an examp
 * Produce some messages with a missing mandatory field: `produce-with-missing-mandatory-field.sh`
 * Verify that the messages are written to the dead letter topic: `consume-from-dlt.sh`
 * Verify that the connector is still running by producing some more good messages and looking at the results in SQL Server. 
+* clean up: `./delete-connector.sh`
