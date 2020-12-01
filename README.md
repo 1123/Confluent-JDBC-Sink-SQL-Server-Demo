@@ -1,12 +1,12 @@
 # Overview
 
-This demo is based upon the following resources
+This demo is based upon the following resources:
 
-* the official Confluent documenation of the JDBC sink connector,
+* the official Confluent documenation of the JDBC sink connector: https://docs.confluent.io/kafka-connect-jdbc/current/sink-connector/index.html
 * the following blog post on Kafka Connect Converters and Serialization: https://www.confluent.io/blog/kafka-connect-deep-dive-converters-serialization-explained/S
-* The following blog post on error handling in Kafka connect: https://www.confluent.io/blog/kafka-connect-deep-dive-error-handling-dead-letter-queues/
+* the following blog post on error handling in Kafka connect: https://www.confluent.io/blog/kafka-connect-deep-dive-error-handling-dead-letter-queues/
 
-It is shown how the Kafka Connect JDBC Sink connector can be used to export data to Microsoft SQL Server, and how dead letter topics can be configured to keep track of messages that could not be deserialized. 
+It is shown how the Kafka Connect JDBC Sink connector can be used to export data to Microsoft SQL Server running as a Docker container, and how dead letter topics can be configured to keep track of messages that could not be deserialized. 
 
 The demo includes a simple example within the `simple` subdirectory and an example showing the dead letter topic in the `DLT` subdirectory. 
 
@@ -14,8 +14,8 @@ The demo includes a simple example within the `simple` subdirectory and an examp
 
 * Confluent Platform and dependencies installed
 * `curl` for interacting with the Kafka Connect Rest API
-* docker
-* access to dockerhub
+* Docker for running Microsoft SQL Server
+* access to dockerhub for pulling the image 
 * `kafkacat` installed for looking at the messages in Kafka. 
   Alternatively this can be done using Confluent Control Center or the standard command line tools that come with Confluent Platform. 
 
@@ -24,11 +24,13 @@ The demo includes a simple example within the `simple` subdirectory and an examp
 ## Setup
 
 * start Microsoft SQL Server in docker: `./start-sql-server-in-docker.sh`
-* Verify that you can connect to SQL Server: `./connect-to-sql-server.sh`
+* verify that you can connect to SQL Server: `./connect-to-sql-server.sh`
 * install the jdbc sink connector to your connect cluster: `./install-jdbc-sink-connector.sh`
-* start Confluent Platform or some other Kafka cluster, Connect Cluster and Confluent Schema Registry: `confluent local services start`
+* start Confluent Platform: `confluent local services start`. Alternatively you can also run some other Kafka cluster, a Connect Cluster and Confluent Schema Registry. 
 
 ##  Running the simple example 
+
+The simple example writes messages in Avro format to Kafka. The Sink connector is configured to auto-create the corresponding table in Microsoft SQL Server. The connector will fail if it encounters any bad message. 
 
 * `cd simple`
 * Deploy the connector. `./post-connector.sh`
@@ -39,6 +41,12 @@ The demo includes a simple example within the `simple` subdirectory and an examp
 * clean up: `./delete-connector.sh`
 
 ## Running the example with the Dead Letter Topic
+
+The DLT example writes messages in Json format to Kafka. 
+The Schema is included within every message. 
+The connector uses the JsonConverters to extract the schema and the payload. 
+Again, the sink table will be auto-created by the connector. 
+Yet instead of failing upon bad messages, the connector will write the bad messages to a dead letter topic and continue processing the good messages. 
 
 * `cd DLT`
 * Deploy the connector. `./post-connector.sh`
@@ -52,3 +60,5 @@ The demo includes a simple example within the `simple` subdirectory and an examp
 * Verify that the messages are written to the dead letter topic: `consume-from-dlt.sh`
 * Verify that the connector is still running by producing some more good messages and looking at the results in SQL Server. 
 * clean up: `./delete-connector.sh`
+
+
